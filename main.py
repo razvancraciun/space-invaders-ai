@@ -3,7 +3,7 @@ import numpy as np
 
 def main():
     agent = Agent()
-    agent.train()
+    agent.train(1)
 
 
 if __name__ == '__main__':
