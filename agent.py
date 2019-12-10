@@ -21,16 +21,18 @@ class Agent:
 
     def train_episode(self, episode):
         done = False
-        state = self.preprocess(self.env.reset())
-        self.init_stack(state)
+        self.init_stack(self.preprocess(self.env.reset()))
+        state = self.stack_frame()
         while not done:
-            Q = self.nn.model.predict(self.stack_frame())
+            Q = self.nn.model.predict(self.stack_frame())[0]
             action = np.argmax(Q)
             new_state, reward, done, _ = self.env.step(action)
-            new_state = self.add_frame(self.preprocess(new_state))
+            self.add_frame(self.preprocess(new_state))
+            new_state = self.stack_frame()
             self.env.render()
-            target = reward + self.discount * max(self.nn.model.predict(self.stack_frame()))
-
+            target = reward + self.discount * max(self.nn.model.predict(new_state)[0])
+            Q[action] = target
+            self.nn.model.fit(x=state, y=Q.reshape(1, *Q.shape), steps_per_epoch=1,epochs = 1, verbose=False)
             state = new_state
 
 

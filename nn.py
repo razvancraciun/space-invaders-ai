@@ -9,7 +9,19 @@ class NN:
         self.output_shape = action_space.n
         self.model = Sequential([
             Conv2D(8, 3, activation='relu', data_format='channels_last', input_shape=(210,160,1)),
+            MaxPool2D(2),
+            Conv2D(16,3, activation='relu'),
+            MaxPool2D(2),
+            Conv2D(32,3, activation='relu'),
+            MaxPool2D(2),
+            Conv2D(64,3, activation='relu'),
+            MaxPool2D(2),
+            Conv2D(64,3, activation='relu'),
+            MaxPool2D(2),
             Flatten(),
+            Dense(64),
             Dense(self.output_shape)
         ])
+        # self.model.summary()
+        # exit()
         self.model.compile(loss='categorical_crossentropy', optimizer='adam')
