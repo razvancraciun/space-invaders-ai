@@ -12,7 +12,7 @@ class Agent:
         self.discount = 0.95
         self.nn = NN(self.env.action_space)
         self.frame_stack = []
-        self.stack_size = 4
+        self.stack_size = 3
 
 
     def train(self, episodes):
@@ -44,10 +44,10 @@ class Agent:
         self.frame_stack.append(frame)
 
     def stack_frame(self):
-        coef = 0.4
+        coef = 0.55
         result = self.frame_stack[-1] * coef
         for frame in reversed(self.frame_stack[:-1]):
-            coef -= 0.1
+            coef -= 0.22
             result += frame * coef
         # plt.imshow(result.reshape(*result.shape[1:-1]), cmap='gray')
         # plt.show()

@@ -22,6 +22,6 @@ class NN:
             Dense(64),
             Dense(self.output_shape)
         ])
-        # self.model.summary()
-        # exit()
+        self.model.summary()
+        exit()
         self.model.compile(loss='categorical_crossentropy', optimizer='adam')
