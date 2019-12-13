@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 import time
+from buffer import ReplayBuffer
 
 class Agent:
     def __init__(self):
@@ -13,13 +14,21 @@ class Agent:
         self.nn = NN(self.env.action_space)
         self.frame_stack = []
         self.stack_size = 3
+        self.buffer = ReplayBuffer(10000)
+        self.render_interval = 10
 
 
     def train(self, episodes):
         for episode in range(episodes):
             self.train_episode(episode)
+            self.train_buffer()
+
+
+    def train_buffer(self):
+        state1, action, reward, new_state = np.split(self.buffer.items, 4, axis = 1)
 
     def train_episode(self, episode):
+        print(f'Playing episode {episode}')
         done = False
         self.init_stack(self.preprocess(self.env.reset()))
         state = self.stack_frame()
@@ -29,10 +38,9 @@ class Agent:
             new_state, reward, done, _ = self.env.step(action)
             self.add_frame(self.preprocess(new_state))
             new_state = self.stack_frame()
-            self.env.render()
-            target = reward + self.discount * max(self.nn.model.predict(new_state)[0])
-            Q[action] = target
-            self.nn.model.fit(x=state, y=Q.reshape(1, *Q.shape), steps_per_epoch=1,epochs = 1, verbose=False)
+            if episode % self.render_interval == 0 and episode != 0:
+                self.env.render()
+            self.buffer.add( [state, action, reward, new_state] )
             state = new_state
 
 
