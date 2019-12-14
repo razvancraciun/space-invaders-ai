@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense, Conv2D, MaxPool2D, Flatten
 from tensorflow.keras import Sequential
 from tensorflow.keras.optimizers import RMSprop
-from keras.losses import categorical_crossentropy
+from tensorflow.keras.losses import categorical_crossentropy
 
 class NN:
     def __init__(self, action_space):

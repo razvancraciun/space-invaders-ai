@@ -14,7 +14,7 @@ class Agent:
         self.nn = NN(self.env.action_space)
         self.frame_stack = []
         self.stack_size = 3
-        self.buffer = ReplayBuffer(10000)
+        self.buffer = ReplayBuffer(100)
         self.render_interval = 10
 
 
@@ -25,7 +25,15 @@ class Agent:
 
 
     def train_buffer(self):
-        state1, action, reward, new_state = np.split(self.buffer.items, 4, axis = 1)
+        items = np.array(self.buffer.items)
+        states_ = items[:,3][:]
+        states_.reshape(len(states_), 210, 160, 1)
+        
+        # state1, action, reward, new_state, Q = items[:,0][:], items[:,1][:], items[:,2][:], items[:,:,3], items[:,4][:]
+        y = self.nn.model.predict(states_)
+        # target = reward + self.discount * np.max(y)
+        # Q[action] = target
+        # self.nn.model.fit(state1, Q)
 
     def train_episode(self, episode):
         print(f'Playing episode {episode}')
@@ -33,14 +41,14 @@ class Agent:
         self.init_stack(self.preprocess(self.env.reset()))
         state = self.stack_frame()
         while not done:
-            Q = self.nn.model.predict(self.stack_frame())[0]
+            Q = self.nn.model.predict(state.reshape(1,*state.shape))[0]
             action = np.argmax(Q)
             new_state, reward, done, _ = self.env.step(action)
             self.add_frame(self.preprocess(new_state))
             new_state = self.stack_frame()
             if episode % self.render_interval == 0 and episode != 0:
                 self.env.render()
-            self.buffer.add( [state, action, reward, new_state] )
+            self.buffer.add( [state, action, reward, new_state, Q] )
             state = new_state
 
 
@@ -66,5 +74,5 @@ class Agent:
             r,g,b = img[:,:,0], img[:,:,1], img[:,:,2]
             return 0.2989 * r + 0.587 * g + 0.114 * b
         result = to_grayscale(state)
-        result = result.reshape(1, *result.shape,1)
+        result = result.reshape(*result.shape,1)
         return result
