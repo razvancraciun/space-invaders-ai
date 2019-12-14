@@ -9,7 +9,7 @@ from buffer import ReplayBuffer
 class Agent:
     def __init__(self):
         self.env = gym.make('SpaceInvaders-v0')
-        self.epsilon = 0.9
+        self.epsilon = 0.99
         self.discount = 0.95
         self.nn = NN(self.env.action_space)
         self.frame_stack = []
@@ -49,11 +49,13 @@ class Agent:
             new_state, reward, done, _ = self.env.step(action)
             self.add_frame(self.preprocess(new_state))
             new_state = self.stack_frame()
-            if episode % self.render_interval == 0 and episode != 0:
-                self.env.render()
+            # if episode % self.render_interval == 0 and episode != 0:
+            #     self.env.render()
             self.buffer.add( [state, action, reward, new_state] )
             state = new_state
-        self.epsilon *= 0.9
+        self.epsilon *= 0.95
+        if self.epsilon < 0.01:
+          self.epsilon = 0.01
 
 
     def init_stack(self, frame):
@@ -72,6 +74,21 @@ class Agent:
         # plt.imshow(result.reshape(*result.shape[1:-1]), cmap='gray')
         # plt.show()
         return result
+
+    def play_episode(self):
+      done = False
+      self.init_stack(self.preprocess(self.env.reset))
+      state = self.stack_frame()
+      done = False
+      while not done:
+          Q = self.nn.model.predict(state.reshape(1,*state.shape))[0]
+          action = np.argmax(Q)
+          new_state, reward, done, _ = self.env.step(action)
+          self.add_frame(self.preprocess(new_state))
+          new_state = self.stack_frame()
+          # if episode % self.render_interval == 0 and episode != 0:
+          #     self.env.render()
+          state = new_state
 
     def preprocess(self, state):
         def to_grayscale(img):
