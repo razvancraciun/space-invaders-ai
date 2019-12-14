@@ -14,8 +14,8 @@ class Agent:
         self.nn = NN(self.env.action_space)
         self.frame_stack = []
         self.stack_size = 3
-        self.buffer = ReplayBuffer(100)
-        self.render_interval = 10
+        self.buffer = ReplayBuffer(3000)
+        self.render_interval = 1
 
 
     def train(self, episodes):
@@ -26,14 +26,15 @@ class Agent:
 
     def train_buffer(self):
         items = np.array(self.buffer.items)
-        states_ = items[:,3][:]
-        states_.reshape(len(states_), 210, 160, 1)
-        
-        # state1, action, reward, new_state, Q = items[:,0][:], items[:,1][:], items[:,2][:], items[:,:,3], items[:,4][:]
-        y = self.nn.model.predict(states_)
-        # target = reward + self.discount * np.max(y)
-        # Q[action] = target
-        # self.nn.model.fit(state1, Q)
+        # unused actions?
+        states, actions, rewards, states_ = np.array(list(items[:,0])), np.array(list(items[:,1])), \
+            np.array(list(items[:,2])), np.array(list(items[:,3]))
+        Qpred = self.nn.model.predict(states)
+        Qnext = self.nn.model.predict(states_)
+        max_actions = np.argmax(Qnext, 1)
+        Qtarget = Qpred
+        Qtarget[:, max_actions] = rewards + self.discount * np.max(Qnext, 1)
+        self.nn.model.fit(states, Qtarget)
 
     def train_episode(self, episode):
         print(f'Playing episode {episode}')
@@ -48,7 +49,7 @@ class Agent:
             new_state = self.stack_frame()
             if episode % self.render_interval == 0 and episode != 0:
                 self.env.render()
-            self.buffer.add( [state, action, reward, new_state, Q] )
+            self.buffer.add( [state, action, reward, new_state] )
             state = new_state
 
 
