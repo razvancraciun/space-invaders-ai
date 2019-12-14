@@ -77,7 +77,7 @@ class Agent:
 
     def play_episode(self):
       done = False
-      self.init_stack(self.preprocess(self.env.reset))
+      self.init_stack(self.preprocess(self.env.reset()))
       state = self.stack_frame()
       done = False
       while not done:
@@ -86,8 +86,7 @@ class Agent:
           new_state, reward, done, _ = self.env.step(action)
           self.add_frame(self.preprocess(new_state))
           new_state = self.stack_frame()
-          # if episode % self.render_interval == 0 and episode != 0:
-          #     self.env.render()
+          self.env.render()
           state = new_state
 
     def preprocess(self, state):
