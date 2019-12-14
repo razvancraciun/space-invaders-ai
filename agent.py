@@ -14,8 +14,8 @@ class Agent:
         self.nn = NN(self.env.action_space)
         self.frame_stack = []
         self.stack_size = 3
-        self.buffer = ReplayBuffer(3000)
-        self.render_interval = 1
+        self.buffer = ReplayBuffer(4000)
+        self.render_interval = 3
 
 
     def train(self, episodes):
@@ -34,7 +34,7 @@ class Agent:
         max_actions = np.argmax(Qnext, 1)
         Qtarget = Qpred
         Qtarget[:, max_actions] = rewards + self.discount * np.max(Qnext, 1)
-        self.nn.model.fit(states, Qtarget)
+        self.nn.model.fit(states, Qtarget, batch_size=100, workers=5)
 
     def train_episode(self, episode):
         print(f'Playing episode {episode}')
@@ -42,8 +42,10 @@ class Agent:
         self.init_stack(self.preprocess(self.env.reset()))
         state = self.stack_frame()
         while not done:
-            Q = self.nn.model.predict(state.reshape(1,*state.shape))[0]
-            action = np.argmax(Q)
+            action = np.random.randint(0, self.env.action_space.n)
+            if np.random.rand() > self.epsilon:
+                Q = self.nn.model.predict(state.reshape(1,*state.shape))[0]
+                action = np.argmax(Q)
             new_state, reward, done, _ = self.env.step(action)
             self.add_frame(self.preprocess(new_state))
             new_state = self.stack_frame()
@@ -51,6 +53,7 @@ class Agent:
                 self.env.render()
             self.buffer.add( [state, action, reward, new_state] )
             state = new_state
+        self.epsilon *= 0.9
 
 
     def init_stack(self, frame):
@@ -75,5 +78,9 @@ class Agent:
             r,g,b = img[:,:,0], img[:,:,1], img[:,:,2]
             return 0.2989 * r + 0.587 * g + 0.114 * b
         result = to_grayscale(state)
+        result = result[20:-15, 15:-15]
+        # plt.imshow(result)
+        # plt.show()
+        # exit()
         result = result.reshape(*result.shape,1)
         return result
