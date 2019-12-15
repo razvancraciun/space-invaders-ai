@@ -16,7 +16,7 @@ class Agent:
         self.stack_size = 3
         self.buffer = ReplayBuffer(10000)
         self.render_interval = 3
-        self.save_interval = 500
+        self.save_interval = 100
 
 
     def train(self, episodes):
