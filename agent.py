@@ -14,7 +14,7 @@ class Agent:
         self.nn = NN(self.env.action_space)
         self.frame_stack = []
         self.stack_size = 3
-        self.buffer = ReplayBuffer(25000)
+        self.buffer = ReplayBuffer(15000)
         self.render_interval = 3
         self.save_interval = 100
         self.train_interval = 10
