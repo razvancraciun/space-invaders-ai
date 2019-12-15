@@ -14,15 +14,16 @@ class Agent:
         self.nn = NN(self.env.action_space)
         self.frame_stack = []
         self.stack_size = 3
-        self.buffer = ReplayBuffer(10000)
+        self.buffer = ReplayBuffer(25000)
         self.render_interval = 3
         self.save_interval = 100
-
+        self.train_interval = 10
 
     def train(self, episodes):
         for episode in range(episodes):
             self.train_episode(episode)
-            self.train_buffer()
+            if episode % self.train_interval == 0 and episode != 0:
+                self.train_buffer()
             if episode % self.save_interval == 0 and episode != 0:
               self.save(episode // self.save_interval)
 
@@ -38,9 +39,8 @@ class Agent:
             np.array(list(items[:,2])), np.array(list(items[:,3]))
         Qpred = self.nn.model.predict(states)
         Qnext = self.nn.model.predict(states_)
-        max_actions = np.argmax(Qnext, 1)
         Qtarget = Qpred
-        Qtarget[:, max_actions] = rewards + self.discount * np.max(Qnext, 1)
+        Qtarget[:, actions] = rewards + self.discount * np.max(Qnext, 1)
         self.nn.model.fit(states, Qtarget, batch_size=100, workers=5)
 
     def train_episode(self, episode):
@@ -60,9 +60,9 @@ class Agent:
             #     self.env.render()
             self.buffer.add( [state, action, reward, new_state] )
             state = new_state
-        self.epsilon *= 0.95
-        if self.epsilon < 0.01:
-          self.epsilon = 0.01
+        self.epsilon *= 0.995
+        if self.epsilon < 0.1:
+          self.epsilon = 0.1
 
 
     def init_stack(self, frame):
