@@ -17,8 +17,8 @@ class NN:
             Conv2D(256,3, activation='relu'),
             MaxPool2D(2),
             Flatten(),
-            Dense(64),
-            Dense(self.output_shape)
+            Dense(64, activation='relu'),
+            Dense(self.output_shape, activation='relu')
         ])
         # self.model.summary()
         # exit()

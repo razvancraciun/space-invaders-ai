@@ -14,14 +14,21 @@ class Agent:
         self.nn = NN(self.env.action_space)
         self.frame_stack = []
         self.stack_size = 3
-        self.buffer = ReplayBuffer(4000)
+        self.buffer = ReplayBuffer(10000)
         self.render_interval = 3
+        self.save_interval = 500
 
 
     def train(self, episodes):
         for episode in range(episodes):
             self.train_episode(episode)
             self.train_buffer()
+            if episode % self.save_interval == 0 and episode != 0:
+              self.save(episode // self.save_interval)
+
+    def save(self, number):
+      self.nn.model.save(f'ckpt{number}.h5')
+
 
 
     def train_buffer(self):

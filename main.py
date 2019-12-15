@@ -3,8 +3,7 @@ import numpy as np
 
 def main():
     agent = Agent()
-    agent.train(100)
-    agent.nn.model.save('asd.h5')
+    agent.train(10000)
 
 
 if __name__ == '__main__':
