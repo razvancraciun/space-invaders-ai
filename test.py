@@ -4,7 +4,7 @@ from tensorflow.keras.models import load_model
 
 def main():
     agent = Agent()
-    agent.nn.model = load_model('asd.h5')
+    agent.nn.model = load_model('ckpt1.h5')
     agent.play_episode() 
 
 

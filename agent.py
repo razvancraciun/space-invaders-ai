@@ -102,6 +102,8 @@ class Agent:
             return 0.2989 * r + 0.587 * g + 0.114 * b
         result = to_grayscale(state)
         result = result[20:-15, 15:-15]
+        result /= 255
+       
         # plt.imshow(result)
         # plt.show()
         # exit()
