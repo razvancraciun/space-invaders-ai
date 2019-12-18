@@ -1,0 +1,11 @@
+{
+    "epsilon": 1,
+    "epsilon_min": 0.01,
+    "epsilon_dec": 0.995,
+    "gamma": 0.95,
+    "batch_size": 64,
+    "memory_size": 10000,
+    "learning_rate": 0.01,
+    "loss": "categorical_crossentropy",
+    "save_path": "./save/"
+}
