@@ -1,12 +1,13 @@
 from nn import init_model
 from buffer import ReplayBuffer
-import gym
 import numpy as np
 import json
 
 class Agent:
     def __init__(self, config_file, input_shape, n_actions):
-        config = json.loads(open(config_file).read())
+        f = open(config_file, 'r')
+        config = json.loads(f.read())
+        f.close()
         self.epsilon = config['epsilon']
         self.epsilon_min = config['epsilon_min']
         self.epsilon_dec = config['epsilon_dec']
@@ -23,7 +24,8 @@ class Agent:
     
 
     def choose_action(self, state):
-        rand = np.random.random()
+        state = state[np.newaxis, :]
+        rand = np.random.rand()
         if rand < self.epsilon:
             action = np.random.choice(self.action_space)
         else:
@@ -41,9 +43,8 @@ class Agent:
         q_next = self.model.predict(to_states)
 
         q_target = q.copy()
-        batch_index = np.arrange(self.batch_size, dtype=np.int32)
-
-        q_target[batch_index, actions] = rewards + self.gamma * np.max(q_next, axis=1)*terminals
+        batch_index = np.arange(self.batch_size, dtype=np.int32)
+        q_target[batch_index, actions] = rewards + self.gamma * np.max(q_next, axis=1) * terminals
 
         self.model.fit(from_states, q_target, verbose=False)
 

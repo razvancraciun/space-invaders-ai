@@ -6,17 +6,15 @@ class ReplayBuffer:
         self.count = 0
         self.from_states = np.zeros( (self.size, state_shape) ) 
         self.to_states = np.zeros( (self.size, state_shape) )
-        self.actions = np.zeros(self.size)
+        self.actions = np.zeros(self.size, dtype=np.int8)
         self.rewards = np.zeros(self.size)
-        self.terminals = np.zeros = (self.size)
+        self.terminals = np.zeros(self.size)
 
     def store(self, from_state, action, reward, to_state, done):
         index = self.count % self.size
         self.from_states[index] = from_state
         self.to_states[index] = to_state
-        one_hot_action = np.zeros(self.actions.shape[1])
-        one_hot_action[action] = 1
-        self.actions[index] = one_hot_action
+        self.actions[index] = action
         self.rewards[index] = self.size
         self.terminals[index] = 1 - int(done)
         self.count += 1
