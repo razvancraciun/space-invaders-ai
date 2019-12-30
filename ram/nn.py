@@ -4,8 +4,8 @@ from tensorflow.keras.optimizers import Adam
 
 def init_model(input_dim, output_dim, learning_rate, loss):
     model = Sequential([
-        Dense(256, input_shape=(input_dim,), activation='relu'),
-        Dense(256, activation = 'relu'),
+        Dense(128, input_shape=(input_dim,), activation='relu'),
+        Dense(64, activation = 'relu'),
         Dense(output_dim)
     ])
     optimizer = Adam(lr = learning_rate)

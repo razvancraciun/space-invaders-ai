@@ -20,8 +20,7 @@ class Agent:
         self.model = init_model(input_shape, n_actions, config['learning_rate'], config['loss'])
         self.buffer = ReplayBuffer(config['memory_size'], input_shape, n_actions)
 
-        self.save_path = config['save_path']
-    
+        self.save_path = config['save_path']    
 
     def choose_action(self, state):
         state = state[np.newaxis, :]
@@ -32,7 +31,6 @@ class Agent:
             actions = self.model.predict(state)
             action = np.argmax(actions)
         return action
-
 
     def train(self):
         if self.buffer.count < self.batch_size:
@@ -53,9 +51,9 @@ class Agent:
         
 
     def save(self, index):
-        self.model.save(self.save_path + f'ckpt{index}.h5')
+        self.model.save_weights(self.save_path + f'ckpt{index}.h5')
 
     def load(self, index):
-        self.model.load(self.save_path + f'ckpt{index}.h5')
+        self.model.load_weights(self.save_path + f'ckpt{index}.h5')
 
     
