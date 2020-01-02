@@ -3,8 +3,16 @@ import gym
 import json
 import matplotlib
 import numpy as np
+import subprocess as sh
+
 
 CONFIG_FILE = 'config.json'
+
+def commit():
+	sh.run('git add .', check=True, shell=True)
+	sh.run('git commit -m "Training..."', check=True, shell=True)
+	sh.run('git push origin master', check=True, shell=True)
+
 
 def main():
 	env = gym.make('SpaceInvaders-ram-v0')
@@ -37,6 +45,7 @@ def main():
 		avg_score = np.mean(scores[max(0, i-10): (i+1)])
 		if i % save_interval == 0 and i != 0:
 			agent.save(i)
+			commit()
 		print(f'episode:{i} score:{round(score,2)} avg_score:{round(avg_score,2)}')
 
 
