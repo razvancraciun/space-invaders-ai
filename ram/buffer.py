@@ -15,7 +15,7 @@ class ReplayBuffer:
         self.from_states[index] = from_state
         self.to_states[index] = to_state
         self.actions[index] = action
-        self.rewards[index] = self.size
+        self.rewards[index] = reward
         self.terminals[index] = 1 - int(done)
         self.count += 1
 
